@@ -150,6 +150,12 @@
     </div>
 
     <div class="card">
+      <label>Дневная норма воды</label>
+      <div><span class="big" id="water"></span></div>
+      <p class="note" id="waterNote"></p>
+    </div>
+
+    <div class="card">
       <label>Дневная норма калорий</label>
       <table>
         <tr><td>Базовый обмен (BMR)</td><td id="bmr"></td></tr>
@@ -157,7 +163,7 @@
         <tr><td>Похудение (−15%)</td><td id="lose"></td></tr>
         <tr><td>Набор массы (+15%)</td><td id="gain"></td></tr>
       </table>
-      <p class="note">ИМТ — по формуле вес / рост². Калории — по формуле Миффлина — Сан-Жеора, умноженной на коэффициент активности. Результат ориентировочный и не заменяет консультацию врача.</p>
+      <p class="note">ИМТ — по формуле вес / рост². Калории — по формуле Миффлина — Сан-Жеора, умноженной на коэффициент активности. Норма воды — 30–40 мл на 1 кг веса в зависимости от активности, включая воду из напитков и еды. Результат ориентировочный и не заменяет консультацию врача.</p>
     </div>
   </section>
 </main>
@@ -179,6 +185,10 @@
 
   const calcBmr = ({ sex, kg, cm, age }) =>
     10 * kg + 6.25 * cm - 5 * age + (sex === 'male' ? 5 : -161);
+
+  // мл воды на 1 кг веса: растёт с уровнем активности
+  const WATER_ML_PER_KG = { 1.2: 30, 1.375: 32, 1.55: 35, 1.725: 38, 1.9: 40 };
+  const GLASS_ML = 250;
 
   const fmt = (n) => `${Math.round(n).toLocaleString('ru-RU')} ккал`;
 
@@ -218,6 +228,11 @@
     const maxNorm = 25 * (data.cm / 100) ** 2;
     $('bmiNote').textContent =
       `Нормальный вес для вашего роста: ${minNorm.toFixed(1)}–${maxNorm.toFixed(1)} кг.`;
+
+    const waterMl = data.kg * WATER_ML_PER_KG[factor];
+    $('water').textContent = `${(waterMl / 1000).toFixed(1).replace('.', ',')} л`;
+    $('waterNote').textContent =
+      `≈ ${Math.round(waterMl / GLASS_ML)} стаканов по ${GLASS_ML} мл (${WATER_ML_PER_KG[factor]} мл на 1 кг веса).`;
 
     const bmr = calcBmr(data);
     const maintain = bmr * factor;
